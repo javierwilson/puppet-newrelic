@@ -1,4 +1,6 @@
-class newrelic::server {
+class newrelic::server(
+    $ensure  = running
+) {
     include newrelic::package
     $newrelic_license = $newrelic::license
 
@@ -22,10 +24,17 @@ class newrelic::server {
 
     service { "newrelic-sysmond":
         enable  => true,
-        ensure  => running,
+        ensure  => $ensure,
         hasstatus => true,
         hasrestart => true,
         require => Class["newrelic::package"];
     }
 
+    # must create /var/run/newrelic/ owned by newrelic otherwise no pid file is created
+    file { "/var/run/newrelic":
+	ensure => "directory",
+        owner => "newrelic",
+        group => "newrelic",
+        before => Service["newrelic-sysmond"],
+    }
 }

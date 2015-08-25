@@ -1,5 +1,10 @@
-class newrelic($license  = $::newrelic_license) {
+class newrelic(
+    $license  = $::newrelic_license,
+    $ensure   = running,
+) {
     include newrelic::repo
     include newrelic::package
-    include newrelic::server
+    class{'newrelic::server':
+        ensure  => $ensure
+    }
 }
